@@ -67,15 +67,18 @@
     </div>
 </div>
 
-<script>
+<canvas id="canvas" width="1000" height="450"></canvas>
 
+<script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 let t = 0;
 
-function drawSpring(x1, x2, y, coils){
+// ⏱️ 리셋 시간
+let lastReset = Date.now();
 
+function drawSpring(x1, x2, y, coils){
     ctx.beginPath();
 
     let length = x2 - x1;
@@ -84,10 +87,8 @@ function drawSpring(x1, x2, y, coils){
     ctx.moveTo(x1, y);
 
     for(let i=1;i<coils;i++){
-
         let x = x1 + i * step;
         let offset = (i % 2 === 0) ? -20 : 20;
-
         ctx.lineTo(x, y + offset);
     }
 
@@ -100,13 +101,19 @@ function drawSpring(x1, x2, y, coils){
 
 function animate(){
 
+    // ⏱️ 5초마다 리셋
+    if(Date.now() - lastReset >= 5000){
+        t = 0;
+        lastReset = Date.now();
+    }
+
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     // 벽
     ctx.fillStyle = "#475569";
     ctx.fillRect(50,120,30,160);
 
-    // 감쇠 진동 공식
+    // 감쇠 진동
     let A = 250;
     let b = 0.01;
     let omega = 0.15;
@@ -123,7 +130,7 @@ function animate(){
     ctx.fillStyle = "#38bdf8";
     ctx.fillRect(massX,150,120,100);
 
-    // 바닥선
+    // 바닥
     ctx.beginPath();
     ctx.moveTo(0,300);
     ctx.lineTo(canvas.width,300);
@@ -135,7 +142,6 @@ function animate(){
     ctx.beginPath();
 
     for(let i=0;i<800;i++){
-
         let x = i + 100;
 
         let y =
@@ -148,8 +154,7 @@ function animate(){
 
         if(i===0){
             ctx.moveTo(x, graphY);
-        }
-        else{
+        } else {
             ctx.lineTo(x, graphY);
         }
     }
@@ -158,10 +163,10 @@ function animate(){
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    // 그래프 설명
+    // 텍스트
     ctx.fillStyle = "white";
     ctx.font = "18px Arial";
-    ctx.fillText("감쇠 진동 그래프", 100, 40);
+    ctx.fillText("감쇠 진동 그래프 (5초마다 리셋)", 100, 40);
 
     t += 1;
 
@@ -169,7 +174,6 @@ function animate(){
 }
 
 animate();
-
 </script>
 
 </body>
