@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>단순 감쇠 조화 운동</title>
+
+<style>
+    body{
+        margin:0;
+        background:#0f172a;
+        color:white;
+        font-family:'Pretendard',sans-serif;
+        overflow:hidden;
+    }
+
+    h1{
+        text-align:center;
+        margin-top:20px;
+        font-size:40px;
+    }
+
+    p{
+        text-align:center;
+        color:#cbd5e1;
+        font-size:18px;
+    }
+
+    canvas{
+        display:block;
+        margin:auto;
+        background:#111827;
+        border:2px solid #334155;
+        border-radius:20px;
+        margin-top:20px;
+    }
+
+    .info{
+        text-align:center;
+        margin-top:20px;
+        font-size:20px;
+    }
+
+    .formula{
+        color:#38bdf8;
+        font-size:22px;
+        margin-top:10px;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>단순 감쇠 조화 운동</h1>
+
+<p>
+시간이 지날수록 진폭이 점점 줄어드는 진동 운동
+</p>
+
+<canvas id="canvas" width="1000" height="400"></canvas>
+
+<div class="info">
+    <div>용수철 + 마찰이 있는 진동 운동</div>
+
+    <div class="formula">
+        x(t) = Ae<sup>-bt</sup> cos(ωt)
+    </div>
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let t = 0;
+
+function drawSpring(x1, x2, y, coils){
+
+    ctx.beginPath();
+
+    let length = x2 - x1;
+    let step = length / coils;
+
+    ctx.moveTo(x1, y);
+
+    for(let i=1;i<coils;i++){
+
+        let x = x1 + i * step;
+        let offset = (i % 2 === 0) ? -20 : 20;
+
+        ctx.lineTo(x, y + offset);
+    }
+
+    ctx.lineTo(x2, y);
+
+    ctx.strokeStyle = "#60a5fa";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+function animate(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // 벽
+    ctx.fillStyle = "#475569";
+    ctx.fillRect(50,120,30,160);
+
+    // 감쇠 진동 공식
+    let A = 250;
+    let b = 0.01;
+    let omega = 0.15;
+
+    let displacement =
+        A * Math.exp(-b * t) * Math.cos(omega * t);
+
+    let massX = 400 + displacement;
+
+    // 스프링
+    drawSpring(80, massX, 200, 20);
+
+    // 질량 블록
+    ctx.fillStyle = "#38bdf8";
+    ctx.fillRect(massX,150,120,100);
+
+    // 바닥선
+    ctx.beginPath();
+    ctx.moveTo(0,300);
+    ctx.lineTo(canvas.width,300);
+    ctx.strokeStyle = "#64748b";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 그래프
+    ctx.beginPath();
+
+    for(let i=0;i<800;i++){
+
+        let x = i + 100;
+
+        let y =
+            80 *
+            Math.exp(-0.003 * i)
+            *
+            Math.cos(0.05 * i);
+
+        let graphY = 80 + y;
+
+        if(i===0){
+            ctx.moveTo(x, graphY);
+        }
+        else{
+            ctx.lineTo(x, graphY);
+        }
+    }
+
+    ctx.strokeStyle = "#f472b6";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // 그래프 설명
+    ctx.fillStyle = "white";
+    ctx.font = "18px Arial";
+    ctx.fillText("감쇠 진동 그래프", 100, 40);
+
+    t += 1;
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
